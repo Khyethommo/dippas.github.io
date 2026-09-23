@@ -1,0 +1,315 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Gym Tracker</title>
+
+  <style>
+    * {
+      box-sizing: border-box;
+      margin: 0;
+      padding: 0;
+      font-family: Arial, sans-serif;
+    }
+
+    body {
+      background: #f4f8ff;
+      color: #172033;
+    }
+
+    header {
+      background: #1473e6;
+      color: white;
+      padding: 25px;
+      text-align: center;
+    }
+
+    header h1 {
+      font-size: 28px;
+      margin-bottom: 5px;
+    }
+
+    header p {
+      opacity: 0.85;
+    }
+
+    .container {
+      max-width: 1000px;
+      margin: 30px auto;
+      padding: 0 16px;
+    }
+
+    .day {
+      background: white;
+      border-radius: 16px;
+      margin-bottom: 20px;
+      padding: 20px;
+      box-shadow: 0 4px 15px rgba(0, 70, 160, 0.08);
+    }
+
+    .day-header {
+      display: flex;
+      justify-content: space-between;
+      align-items: center;
+      margin-bottom: 15px;
+    }
+
+    .day h2 {
+      color: #1473e6;
+    }
+
+    .focus {
+      background: #e8f2ff;
+      color: #1473e6;
+      padding: 6px 12px;
+      border-radius: 20px;
+      font-size: 13px;
+      font-weight: bold;
+    }
+
+    table {
+      width: 100%;
+      border-collapse: collapse;
+    }
+
+    th {
+      text-align: left;
+      color: #6c7890;
+      font-size: 13px;
+      padding: 10px;
+    }
+
+    td {
+      border-top: 1px solid #edf1f7;
+      padding: 10px;
+    }
+
+    input[type="number"] {
+      width: 70px;
+      padding: 8px;
+      border: 1px solid #d9e2ef;
+      border-radius: 8px;
+      outline: none;
+    }
+
+    input[type="number"]:focus {
+      border-color: #1473e6;
+    }
+
+    input[type="checkbox"] {
+      width: 20px;
+      height: 20px;
+      accent-color: #1473e6;
+    }
+
+    .progress-card {
+      background: #1473e6;
+      color: white;
+      padding: 20px;
+      border-radius: 16px;
+      margin-bottom: 25px;
+    }
+
+    .progress-bar {
+      height: 12px;
+      background: rgba(255,255,255,0.3);
+      border-radius: 20px;
+      overflow: hidden;
+      margin-top: 12px;
+    }
+
+    #progress {
+      height: 100%;
+      width: 0%;
+      background: white;
+      border-radius: 20px;
+      transition: width 0.3s ease;
+    }
+
+    @media (max-width: 650px) {
+      .container {
+        margin-top: 15px;
+      }
+
+      .day {
+        overflow-x: auto;
+      }
+
+      table {
+        min-width: 600px;
+      }
+    }
+  </style>
+</head>
+
+<body>
+
+<header>
+  <h1>Gym Tracker</h1>
+  <p>Track your workouts and progress.</p>
+</header>
+
+<div class="container">
+
+  <div class="progress-card">
+    <h3>Weekly Progress</h3>
+    <p id="progressText">0 / 15 exercises completed</p>
+
+    <div class="progress-bar">
+      <div id="progress"></div>
+    </div>
+  </div>
+
+  <div id="workouts"></div>
+
+</div>
+
+<script>
+
+const workoutPlan = [
+  {
+    day: "Monday",
+    focus: "Legs",
+    exercises: [
+      ["Leg Press", 3, "8–12"],
+      ["Leg Curl", 3, "8–12"],
+      ["Leg Extension", 3, "8–12"],
+      ["Calf Raises", 3, "10–15"],
+      ["Plank", 3, "20–40 sec"]
+    ]
+  },
+
+  {
+    day: "Wednesday",
+    focus: "Upper Body",
+    exercises: [
+      ["Chest Press", 3, "8–12"],
+      ["Lat Pulldown", 3, "8–12"],
+      ["Seated Row", 3, "8–12"],
+      ["Shoulder Press", 3, "8–12"],
+      ["Bicep Curl", 2, "10–12"]
+    ]
+  },
+
+  {
+    day: "Friday",
+    focus: "Full Body",
+    exercises: [
+      ["Leg Press", 3, "8–12"],
+      ["Chest Press", 3, "8–12"],
+      ["Lat Pulldown", 3, "8–12"],
+      ["Seated Row", 3, "8–12"],
+      ["Dead Bug", 3, "8–12 / side"]
+    ]
+  }
+];
+
+const container = document.getElementById("workouts");
+
+workoutPlan.forEach((workout, dayIndex) => {
+
+  const card = document.createElement("div");
+  card.className = "day";
+
+  card.innerHTML = `
+    <div class="day-header">
+      <h2>${workout.day}</h2>
+      <span class="focus">${workout.focus}</span>
+    </div>
+
+    <table>
+      <thead>
+        <tr>
+          <th>Exercise</th>
+          <th>Sets</th>
+          <th>Reps</th>
+          <th>Weight</th>
+          <th>Done</th>
+        </tr>
+      </thead>
+
+      <tbody>
+        ${workout.exercises.map((exercise, exerciseIndex) => `
+          <tr>
+            <td><strong>${exercise[0]}</strong></td>
+            <td>${exercise[1]}</td>
+            <td>${exercise[2]}</td>
+
+            <td>
+              <input
+                type="number"
+                placeholder="kg"
+                data-weight="${dayIndex}-${exerciseIndex}"
+              >
+            </td>
+
+            <td>
+              <input
+                type="checkbox"
+                data-check="${dayIndex}-${exerciseIndex}"
+              >
+            </td>
+          </tr>
+        `).join("")}
+      </tbody>
+    </table>
+  `;
+
+  container.appendChild(card);
+});
+
+
+/* SAVE EVERYTHING */
+
+document.querySelectorAll("input").forEach(input => {
+
+  const key =
+    input.dataset.weight
+      ? "weight-" + input.dataset.weight
+      : "check-" + input.dataset.check;
+
+  if(input.type === "checkbox") {
+    input.checked = localStorage.getItem(key) === "true";
+  } else {
+    input.value = localStorage.getItem(key) || "";
+  }
+
+  input.addEventListener("change", () => {
+
+    if(input.type === "checkbox") {
+      localStorage.setItem(key, input.checked);
+    } else {
+      localStorage.setItem(key, input.value);
+    }
+
+    updateProgress();
+  });
+
+});
+
+
+function updateProgress() {
+
+  const checks =
+    document.querySelectorAll('input[type="checkbox"]');
+
+  const completed =
+    document.querySelectorAll('input[type="checkbox"]:checked').length;
+
+  const percentage =
+    (completed / checks.length) * 100;
+
+  document.getElementById("progress").style.width =
+    percentage + "%";
+
+  document.getElementById("progressText").textContent =
+    `${completed} / ${checks.length} exercises completed`;
+}
+
+updateProgress();
+
+</script>
+
+</body>
+</html>
